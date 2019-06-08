@@ -5,8 +5,7 @@ from datetime import datetime
 import requests
 
 # If modifying these scopes, delete the file token.pickle.
-from argsutil import parse_args
-from db import db_transaction, get_connection
+from argsutil import parse_args_aidbox
 from row_parser import RowParser
 from spreadsheet import spreadsheet
 
@@ -25,8 +24,7 @@ def main(args):
             'https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/patient_exemple_proband.json').json()
         patient_proband['link'].pop(2)  # No brothers or sisters
         row_parser = RowParser(values[0][0:19])
-        # connection = get_connection(args)
-        # with db_transaction(connection):
+
         for row in values[1:]:
             participant_row = row_parser.as_dict(row[0:19])
             is_proband = participant_row['isProband'] == 'true'
@@ -41,12 +39,13 @@ def main(args):
             birth_date = datetime.strptime(participant_row['birthdate'], '%y-%m-%d')
             participant['birthDate'] = birth_date.strftime('%Y-%m-%d')
 
-            participant['active'] = participant_row['active']
+            participant['active'] = bool(participant_row['active'])
             participant['gender'] = participant_row['gender']
 
-            participant['name']['use'] = participant_row['name.use']
-            participant['name']['family'] = participant_row['name.family']
-            participant['name']['given'] = [participant_row['name.given']]
+            name = participant['name'][0]
+            name['use'] = participant_row['name.use']
+            name['family'] = participant_row['name.family']
+            name['given'] = [participant_row['name.given']]
             participant['managingOrganization']['reference'] = \
                 f"Organization/{participant_row['managingOrganization']}"
             participant['generalPractitioner'][0]['reference'] = \
@@ -60,7 +59,7 @@ def main(args):
                 if extension['url'] == 'familyComposition':
                     extension['valueCode'] = participant_row['familyComposition']
                 if extension['url'] == 'isProband':
-                    extension['valueBoolean'] = participant_row['isProband']
+                    extension['valueBoolean'] = is_proband
 
             if is_proband:
                 father = participant['link'][0]
@@ -73,16 +72,11 @@ def main(args):
                     mother['other']['reference'] = f"Patient/{participant_row['MTH']}"
                 else:
                     participant['link'].remove(mother)
-            participant_json = json.dumps(participant, ensure_ascii=False)
-            print(participant_json)
-            r = requests.put(f"http://localhost:8888/Patient/{participant['id']}", data=participant_json, headers={'Authorization':'Basic aW1wb3J0OnNlY3JldA==', "Content-Type": "application/json"})
-            print(r.text)
-            print(r)
-
-            # cursor = connection.cursor()
-            # insert_query = "insert into patient (id, txid, resource, status) values (%s, 0, %s, 'created')"
-            # cursor.execute(insert_query, (participant['id'], participant_json))
-
+            participant_json = json.dumps(participant)
+            response = requests.put(f"{args.url}/Patient/{participant['id']}", data=participant_json,
+                         headers={'Authorization': f"Basic {args.token}", "Content-Type": "application/json"})
+            if response.status_code not in (201, 200):
+                raise Exception(f'Aidobox did not return status code 201, status={response.status_code} \ntext={response.text} \nparticipant={participant_json}')
 
 if __name__ == '__main__':
-    main(parse_args())
+    main(parse_args_aidbox())
