@@ -1,0 +1,1 @@
+{"resourceType":"OperationOutcome","text":{"div":"GET /Pratient/$dump not found"},"issue":[{"severity":"error","code":"not-found","details":{"text":"GET /Pratient/$dump not found"}}]}
