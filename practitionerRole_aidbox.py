@@ -35,7 +35,7 @@ def main(args):
             code['coding'][0]['display'] = practitioner_role_row['code.coding.display']
             code['text']=practitioner_role_row['code.text']
             practitioner_role_json = json.dumps(practitioner_role)
-            response = requests.put(f"{args.url}/PractitionerRole/{practitioner_role['id']}", data=practitioner_role_json,
+            response = requests.put(f"{args.url}/fhir/PractitionerRole/{practitioner_role['id']}", data=practitioner_role_json,
                                     headers={'Authorization': f"Basic {args.token}",
                                              "Content-Type": "application/json"})
             if response.status_code not in (201, 200):

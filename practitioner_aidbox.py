@@ -35,7 +35,7 @@ def main(args):
             else:
                 practitioner['identifier'].pop(0)
             practitioner_json = json.dumps(practitioner)
-            response = requests.put(f"{args.url}/Practitioner/{practitioner['id']}", data=practitioner_json,
+            response = requests.put(f"{args.url}/fhir/Practitioner/{practitioner['id']}", data=practitioner_json,
                          headers={'Authorization': f"Basic {args.token}", "Content-Type": "application/json"})
             if response.status_code not in (201, 200):
                 raise Exception(f'Aidobox did not return status code 201, status={response.status_code} \ntext={response.text} \nparticipant={practitioner_json}')

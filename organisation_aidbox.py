@@ -30,7 +30,7 @@ def main(args):
             organization['alias'] = [organization_row['alias']]
 
             organization_json = json.dumps(organization)
-            response = requests.put(f"{args.url}/Organization/{organization['id']}", data=organization_json,
+            response = requests.put(f"{args.url}/fhir/Organization/{organization['id']}", data=organization_json,
                                     headers={'Authorization': f"Basic {args.token}",
                                              "Content-Type": "application/json"})
             if response.status_code not in (201, 200):

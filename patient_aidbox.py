@@ -73,7 +73,7 @@ def main(args):
                 else:
                     participant['link'].remove(mother)
             participant_json = json.dumps(participant)
-            response = requests.put(f"{args.url}/Patient/{participant['id']}", data=participant_json,
+            response = requests.put(f"{args.url}/fhir/Patient/{participant['id']}", data=participant_json,
                          headers={'Authorization': f"Basic {args.token}", "Content-Type": "application/json"})
             if response.status_code not in (201, 200):
                 raise Exception(f'Aidobox did not return status code 201, status={response.status_code} \ntext={response.text} \nparticipant={participant_json}')

@@ -31,7 +31,7 @@ def main(args):
             fmh['note'][0]['text'] = fmh_row['note']
 
             fmh_json = json.dumps(fmh)
-            response = requests.put(f"{args.url}/FamilyMemberHistory/{fmh['id']}", data=fmh_json,
+            response = requests.put(f"{args.url}/fhir/FamilyMemberHistory/{fmh['id']}", data=fmh_json,
                          headers={'Authorization': f"Basic {args.token}", "Content-Type": "application/json"})
             if response.status_code not in (201, 200):
                 raise Exception(f'Aidobox did not return status code 201, status={response.status_code} \ntext={response.text} \nfmh={fmh_json}')

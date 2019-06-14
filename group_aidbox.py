@@ -27,7 +27,7 @@ def main(args):
                 group['member'].extend([{'entity': {'reference': f"Patient/{r}"}}])
 
             group_json = json.dumps(group)
-            response = requests.put(f"{args.url}/Group/{group['id']}", data=group_json,
+            response = requests.put(f"{args.url}/fhir/Group/{group['id']}", data=group_json,
                          headers={'Authorization': f"Basic {args.token}", "Content-Type": "application/json"})
             if response.status_code not in (201, 200):
                 raise Exception(f'Aidobox did not return status code 201, status={response.status_code} \ntext={response.text} \ngroup={group_json}')
