@@ -30,6 +30,8 @@ def main(args):
 
             specimen['subject']['reference'] = f"Patient/{specimen_row['subject']}"
             specimen['request'][0]['reference'] = f"ServiceRequest/{specimen_row['request']}"
+            #First, run with specimen.pop; then run ServiceRequest; then uncomment specimen.pop and re-run specimen
+            #specimen.pop('request')
             specimen['container'][0]['identifier'][0]['value'] = specimen_row['container.identifier.value']
 
             specimen_json = json.dumps(specimen)

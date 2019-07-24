@@ -12,7 +12,7 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 # The ID and range of a sample spreadsheet.
 SAMPLE_SPREADSHEET_ID = '1jAP_jpsGA6GS_qFcYwt6TdppW4QU4qCxKocOiZ8Up8g'
-SAMPLE_RANGE_NAME = 'clinicalImpression!A:J'
+SAMPLE_RANGE_NAME = 'clinicalImpression!A:K'
 
 
 def main(args):
@@ -33,7 +33,7 @@ def main(args):
             clinical_impression['assessor']['reference'] = f"PractitionerRole/{clinical_impression_row['assessor']}"
             clinical_impression['extension'][0]['valueAge']['value'] = int(clinical_impression_row['valueAge'])
             clinical_impression['investigation'][0]['item'] = []
-            for r in row[5:9]:
+            for r in row[5:10]:
                 clinical_impression['investigation'][0]['item'].extend([{'reference': r}])
 
             clinical_impression_json = json.dumps(clinical_impression)

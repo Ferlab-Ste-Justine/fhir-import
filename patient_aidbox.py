@@ -28,6 +28,7 @@ def main(args):
         for row in values[1:]:
             participant_row = row_parser.as_dict(row[0:19])
             is_proband = participant_row['isProband'] == 'true'
+            status = participant_row['status'] == 'true'
             participant = copy.deepcopy(patient_proband) if is_proband else copy.deepcopy(patient_mother)
 
             participant['id'] = participant_row['id']
@@ -60,6 +61,8 @@ def main(args):
                     extension['valueCode'] = participant_row['familyComposition']
                 if extension['url'] == 'isProband':
                     extension['valueBoolean'] = is_proband
+                if extension['url'] == 'status':
+                    extension['valueBoolean'] = status
 
             if is_proband:
                 father = participant['link'][0]

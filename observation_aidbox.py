@@ -19,11 +19,19 @@ def main(args):
     with spreadsheet(SAMPLE_SPREADSHEET_ID, SAMPLE_RANGE_NAME) as values:
         observation_pheno = requests.get('https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/observation_exemple_de_pheno.json').json()
         observation_notes = requests.get('https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/observation_exemple_de_notes.json').json()
+        # observation_exemple_indications.json
+        observation_indication = requests.get('https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/observation_exemple_indications.json').json()
         row_parser = RowParser(values[0])
         for row in values[1:]:
             observation_row = row_parser.as_dict(row)
             is_pheno = observation_row['code.text'] == 'phenotype observation'
-            observation = copy.deepcopy(observation_pheno) if is_pheno else copy.deepcopy(observation_notes)
+            is_indication = observation_row['code.text'] == 'Indications'
+            if is_pheno:
+                observation = copy.deepcopy(observation_pheno)
+            elif is_indication:
+                observation = copy.deepcopy(observation_indication)
+            else:
+                observation = copy.deepcopy(observation_notes)
 
             observation['id'] = observation_row['id']
             observation['effectiveDateTime'] = observation_row['effectiveDateTime']
