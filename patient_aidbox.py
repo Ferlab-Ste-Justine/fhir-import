@@ -12,8 +12,10 @@ from spreadsheet import spreadsheet
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 # The ID and range of a sample spreadsheet.
-SAMPLE_SPREADSHEET_ID = '1jAP_jpsGA6GS_qFcYwt6TdppW4QU4qCxKocOiZ8Up8g'
-SAMPLE_RANGE_NAME = 'patient!B1:V151'
+#SAMPLE_SPREADSHEET_ID = '1jAP_jpsGA6GS_qFcYwt6TdppW4QU4qCxKocOiZ8Up8g'
+SAMPLE_SPREADSHEET_ID = '1JFkgwUatREiqXL_XRtchUC6LK7kYP7fG9_u4c8L61cI'
+#SAMPLE_RANGE_NAME = 'patient!B1:V151'
+SAMPLE_RANGE_NAME = 'patient!B1:V63'
 
 
 def main(args):
