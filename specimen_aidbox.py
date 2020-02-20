@@ -32,14 +32,28 @@ def main(args):
             specimen['subject']['reference'] = f"Patient/{specimen_row['subject']}"
             specimen['request'][0]['reference'] = f"ServiceRequest/{specimen_row['request']}"
             #First, run with specimen.pop; then run ServiceRequest; then uncomment specimen.pop and re-run specimen
-            #specimen.pop('request')
-            specimen['container'][0]['identifier'][0]['value'] = specimen_row['container.identifier.value']
+            if args.skip_service_requests:
+                specimen.pop('request')
+            else:
+                specimen['container'][0]['identifier'][0]['value'] = specimen_row['container.identifier.value']
 
             specimen_json = json.dumps(specimen)
             response = requests.put(f"{args.url}/fhir/Specimen/{specimen['id']}", data=specimen_json,
                          headers={'Authorization': f"Basic {args.token}", "Content-Type": "application/json"})
             if response.status_code not in (201, 200):
-                raise Exception(f'Aidobox did not return status code 201, status={response.status_code} \ntext={response.text} \nspecimen={specimen_json}')
+                raise Exception(f'Aidbox did not return status code 201, status={response.status_code} \ntext={response.text} \nspecimen={specimen_json}')
 
 if __name__ == '__main__':
-    main(parse_args_aidbox())
+    extra_args = [
+        {
+            'flags': ['-q', '--skip-service-requests'], 
+            'options': {
+                'help': 'Whether to skip processing service requests', 
+                'action': 'store_true',
+                'dest': 'skip_service_requests'
+            }
+        }
+    ]
+    main(
+        parse_args_aidbox(extra_args=extra_args)
+    )

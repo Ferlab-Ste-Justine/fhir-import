@@ -15,7 +15,7 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 #SAMPLE_SPREADSHEET_ID = '1jAP_jpsGA6GS_qFcYwt6TdppW4QU4qCxKocOiZ8Up8g'
 SAMPLE_SPREADSHEET_ID = '1JFkgwUatREiqXL_XRtchUC6LK7kYP7fG9_u4c8L61cI'
 #SAMPLE_RANGE_NAME = 'patient!B1:V151'
-SAMPLE_RANGE_NAME = 'patient!B1:V50'
+SAMPLE_RANGE_NAME = 'patient!B1:V200'
 
 
 def main(args):

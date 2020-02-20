@@ -11,9 +11,12 @@ def parse_args():
 
     return parser.parse_args()
 
-def parse_args_aidbox():
+def parse_args_aidbox(extra_args=None):
     parser = argparse.ArgumentParser(description='Import data to postgres')
     parser.add_argument('-u', '--url', help='Aidbox url', default='http://localhost:8888')
     parser.add_argument('-t', '--token', help='Token', default='<None>')
+    if extra_args is not None:
+        for extra_arg in extra_args:
+            parser.add_argument(*extra_arg['flags'], **extra_arg['options'])
 
     return parser.parse_args()
