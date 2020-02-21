@@ -13,7 +13,7 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 # The ID and range of a sample spreadsheet.
 #SAMPLE_SPREADSHEET_ID = '1jAP_jpsGA6GS_qFcYwt6TdppW4QU4qCxKocOiZ8Up8g'
 SAMPLE_SPREADSHEET_ID = '1JFkgwUatREiqXL_XRtchUC6LK7kYP7fG9_u4c8L61cI'
-SAMPLE_RANGE_NAME = 'specimen!A:F'
+SAMPLE_RANGE_NAME = 'specimen!A:J'
 
 
 def main(args):
@@ -40,6 +40,12 @@ def main(args):
                 specimen['parent'][0]['reference'] =  f"Specimen/{specimen_row['parent']}"
             else:
                 specimen.pop('parent')
+
+            specimen['type']['text'] = specimen_row['type.text']
+            specimen['type']['coding'][0]['system'] = specimen_row['type.coding.system']
+            specimen['type']['coding'][0]['code'] = specimen_row['type.coding.code']
+            specimen['type']['coding'][0]['display'] = specimen_row['type.coding.display']
+
             specimen_json = json.dumps(specimen)
             response = requests.put(f"{args.url}/fhir/Specimen/{specimen['id']}", data=specimen_json,
                          headers={'Authorization': f"Basic {args.token}", "Content-Type": "application/json"})
