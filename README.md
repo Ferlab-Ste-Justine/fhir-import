@@ -18,13 +18,13 @@ For local troubleshooting, you can do the following:
 docker-compose up -d
 ```
 
-2. Going back to the root directory of this repo, run a shell in a container setup to interact with your local aidbox by typing:
+3. Going back to the root directory of this repo, run a shell in a container setup to interact with your local aidbox by typing:
 
 ```
 ./devbash.sh
 ```
 
-3. Inside the container, perform the update on your aidbox by typing:
+4. Inside the container, perform the update on your aidbox by typing:
 
 ```
 ./upsert.sh

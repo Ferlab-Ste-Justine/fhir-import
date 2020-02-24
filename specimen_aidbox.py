@@ -13,14 +13,13 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 # The ID and range of a sample spreadsheet.
 #SAMPLE_SPREADSHEET_ID = '1jAP_jpsGA6GS_qFcYwt6TdppW4QU4qCxKocOiZ8Up8g'
 SAMPLE_SPREADSHEET_ID = '1JFkgwUatREiqXL_XRtchUC6LK7kYP7fG9_u4c8L61cI'
-SAMPLE_RANGE_NAME = 'specimen!A:F'
+SAMPLE_RANGE_NAME = 'specimen!A:J'
 
 
 def main(args):
     with spreadsheet(SAMPLE_SPREADSHEET_ID, SAMPLE_RANGE_NAME) as values:
         specimen_model = requests.get(
             'https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/specimen.json').json()
-        specimen_model.pop('parent')
         row_parser = RowParser(values[0])
         for row in values[1:]:
             specimen_row = row_parser.as_dict(row)
@@ -31,11 +30,21 @@ def main(args):
 
             specimen['subject']['reference'] = f"Patient/{specimen_row['subject']}"
             specimen['request'][0]['reference'] = f"ServiceRequest/{specimen_row['request']}"
-            #First, run with specimen.pop; then run ServiceRequest; then uncomment specimen.pop and re-run specimen
+
             if args.skip_service_requests:
                 specimen.pop('request')
             else:
                 specimen['container'][0]['identifier'][0]['value'] = specimen_row['container.identifier.value']
+
+            if specimen_row['parent'] != 'null' and not args.skip_parents:
+                specimen['parent'][0]['reference'] =  f"Specimen/{specimen_row['parent']}"
+            else:
+                specimen.pop('parent')
+
+            specimen['type']['text'] = specimen_row['type.text']
+            specimen['type']['coding'][0]['system'] = specimen_row['type.coding.system']
+            specimen['type']['coding'][0]['code'] = specimen_row['type.coding.code']
+            specimen['type']['coding'][0]['display'] = specimen_row['type.coding.display']
 
             specimen_json = json.dumps(specimen)
             response = requests.put(f"{args.url}/fhir/Specimen/{specimen['id']}", data=specimen_json,
@@ -46,11 +55,19 @@ def main(args):
 if __name__ == '__main__':
     extra_args = [
         {
-            'flags': ['-q', '--skip-service-requests'], 
+            'flags': ['--skip-service-requests'], 
             'options': {
                 'help': 'Whether to skip processing service requests', 
                 'action': 'store_true',
                 'dest': 'skip_service_requests'
+            }
+        },
+        {
+            'flags': ['--skip-parents'], 
+            'options': {
+                'help': 'Whether to skip processing of speciment parents', 
+                'action': 'store_true',
+                'dest': 'skip_parents'
             }
         }
     ]
