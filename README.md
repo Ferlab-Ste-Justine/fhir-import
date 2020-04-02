@@ -10,21 +10,15 @@ You can build an image that is composable at runtime from the Dockerfile.
 
 For local troubleshooting, you can do the following:
 
-1. Go into the **aidbox** directory and enter your license key and id in the **.env** file.
+1. Clone the devops repo and launch a local aidbox stack: https://github.com/cr-ste-justine/devops/tree/dev/aidbox 
 
-2. Still from the **aidbox** directory, launch a local instance of the aidbox system by typing:
-
-```
-docker-compose up -d
-```
-
-3. Going back to the root directory of this repo, run a shell in a container setup to interact with your local aidbox by typing:
+2. Going back to the root directory of this repo, run a shell in a container setup to interact with your local aidbox by typing:
 
 ```
 ./devbash.sh
 ```
 
-4. Inside the container, perform the update on your aidbox by typing:
+3. Inside the container, perform the update on your aidbox by typing:
 
 ```
 ./upsert.sh
