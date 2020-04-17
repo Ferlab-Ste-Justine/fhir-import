@@ -1,7 +1,9 @@
 FROM python:3.8
 
-COPY . /opt
-
 WORKDIR /opt
 
+COPY requirements.txt /opt
+
 RUN pip install -r requirements.txt
+
+COPY . /opt
