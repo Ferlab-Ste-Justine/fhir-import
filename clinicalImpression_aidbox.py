@@ -8,6 +8,8 @@ from argsutil import parse_args_aidbox
 from row_parser import RowParser
 from spreadsheet import spreadsheet
 
+import fhir_model
+
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 # The ID and range of a sample spreadsheet.
@@ -15,11 +17,9 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 SAMPLE_SPREADSHEET_ID = '1JFkgwUatREiqXL_XRtchUC6LK7kYP7fG9_u4c8L61cI'
 SAMPLE_RANGE_NAME = 'clinicalImpression!A:K'
 
-
 def main(args):
     with spreadsheet(SAMPLE_SPREADSHEET_ID, SAMPLE_RANGE_NAME) as values:
-        clinical_impression_model = requests.get(
-            'https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/clinicalImpression.json').json()
+        clinical_impression_model = fhir_model.get('clinicalImpression.json')
         clinical_impression_model.pop('meta')
         row_parser = RowParser(values[0])
 

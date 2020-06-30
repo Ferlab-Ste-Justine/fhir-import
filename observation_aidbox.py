@@ -8,6 +8,8 @@ from argsutil import parse_args_aidbox
 from row_parser import RowParser
 from spreadsheet import spreadsheet
 
+import fhir_model
+
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 # The ID and range of a sample spreadsheet.
@@ -18,10 +20,10 @@ SAMPLE_RANGE_NAME = 'observation!A:K'
 
 def main(args):
     with spreadsheet(SAMPLE_SPREADSHEET_ID, SAMPLE_RANGE_NAME) as values:
-        observation_pheno = requests.get('https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/observation_exemple_de_pheno.json').json()
-        observation_notes = requests.get('https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/observation_exemple_de_notes.json').json()
+        observation_pheno = fhir_model.get('observation_exemple_de_pheno.json')
+        observation_notes = fhir_model.get('observation_exemple_de_notes.json')
         # observation_exemple_indications.json
-        observation_indication = requests.get('https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/observation_exemple_indications.json').json()
+        observation_indication = fhir_model.get('observation_exemple_indications.json')
         row_parser = RowParser(values[0])
         for row in values[1:]:
             observation_row = row_parser.as_dict(row)

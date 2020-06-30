@@ -7,6 +7,8 @@ import requests
 from argsutil import parse_args_aidbox
 from spreadsheet import spreadsheet
 
+import fhir_model
+
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 # The ID and range of a sample spreadsheet.
@@ -17,8 +19,7 @@ SAMPLE_RANGE_NAME = 'group!A2:P'
 
 def main(args):
     with spreadsheet(SAMPLE_SPREADSHEET_ID, SAMPLE_RANGE_NAME) as values:
-        group_model = requests.get(
-            'https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/group.json').json()
+        group_model = fhir_model.get('group.json')
         for row in values:
             group = copy.deepcopy(group_model)
 
