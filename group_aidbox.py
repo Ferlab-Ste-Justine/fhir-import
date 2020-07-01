@@ -1,5 +1,6 @@
 import copy
 import json
+import logging
 
 import requests
 
@@ -7,8 +8,10 @@ import requests
 from argsutil import parse_args_aidbox
 from spreadsheet import spreadsheet
 
+from error_handling import handle_aidbox_response
 import fhir_model
 
+LOGGER = logging.getLogger(__name__)
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 # The ID and range of a sample spreadsheet.
@@ -31,8 +34,7 @@ def main(args):
             group_json = json.dumps(group)
             response = requests.put(f"{args.url}/fhir/Group/{group['id']}", data=group_json,
                          headers={'Authorization': f"Basic {args.token}", "Content-Type": "application/json"})
-            if response.status_code not in (201, 200):
-                raise Exception(f'Aidobox did not return status code 201, status={response.status_code} \ntext={response.text} \ngroup={group_json}')
+            handle_aidbox_response(response, group_json, LOGGER)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
 import copy
 import json
+import logging
 
 import requests
 
@@ -8,6 +9,10 @@ from argsutil import parse_args_aidbox
 from row_parser import RowParser
 from spreadsheet import spreadsheet
 
+from error_handling import handle_aidbox_response
+import fhir_model
+
+LOGGER = logging.getLogger(__name__)
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 # The ID and range of a sample spreadsheet.
@@ -18,8 +23,7 @@ SAMPLE_RANGE_NAME = 'serviceRequest!A1:H50'
 
 def main(args):
     with spreadsheet(SAMPLE_SPREADSHEET_ID, SAMPLE_RANGE_NAME) as values:
-        service_request_model = requests.get(
-            'https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/serviceRequest.json').json()
+        service_request_model = fhir_model.get('serviceRequest.json')
         row_parser = RowParser(values[0])
         for row in values[1:]:
             service_request_row = row_parser.as_dict(row)
@@ -38,8 +42,7 @@ def main(args):
             service_request_json = json.dumps(service_request)
             response = requests.put(f"{args.url}/fhir/ServiceRequest/{service_request['id']}", data=service_request_json,
                          headers={'Authorization': f"Basic {args.token}", "Content-Type": "application/json"})
-            if response.status_code not in (201, 200):
-                raise Exception(f'Aidobox did not return status code 201, status={response.status_code} \ntext={response.text} \nservice_request={service_request_json}')
+            handle_aidbox_response(response, service_request_json, LOGGER)
 
 if __name__ == '__main__':
     main(parse_args_aidbox())
