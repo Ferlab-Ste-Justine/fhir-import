@@ -1,6 +1,7 @@
 import copy
 import json
 from datetime import datetime
+import logging
 
 import requests
 
@@ -9,6 +10,10 @@ from argsutil import parse_args_aidbox
 from row_parser import RowParser
 from spreadsheet import spreadsheet
 
+from error_handling import handle_aidbox_response
+import fhir_model
+
+LOGGER = logging.getLogger(__name__)
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 # The ID and range of a sample spreadsheet.
@@ -20,10 +25,8 @@ SAMPLE_RANGE_NAME = 'patient!B1:V53'
 
 def main(args):
     with spreadsheet(SAMPLE_SPREADSHEET_ID, SAMPLE_RANGE_NAME) as values:
-        patient_mother = requests.get(
-            'https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/patient_exemple_mother.json').json()
-        patient_proband = requests.get(
-            'https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/patient_exemple_proband.json').json()
+        patient_mother = fhir_model.get('patient_exemple_mother.json')
+        patient_proband = fhir_model.get('patient_exemple_proband.json')
         patient_proband['link'].pop(2)  # No brothers or sisters
         row_parser = RowParser(values[0][0:19])
 
@@ -80,8 +83,7 @@ def main(args):
             participant_json = json.dumps(participant)
             response = requests.put(f"{args.url}/fhir/Patient/{participant['id']}", data=participant_json,
                          headers={'Authorization': f"Basic {args.token}", "Content-Type": "application/json"})
-            if response.status_code not in (201, 200):
-                raise Exception(f'Aidobox did not return status code 201, status={response.status_code} \ntext={response.text} \nparticipant={participant_json}')
+            handle_aidbox_response(response, participant_json, LOGGER)
 
 if __name__ == '__main__':
     main(parse_args_aidbox())

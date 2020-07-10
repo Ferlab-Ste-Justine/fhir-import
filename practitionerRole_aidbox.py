@@ -1,5 +1,6 @@
 import copy
 import json
+import logging
 
 import requests
 
@@ -8,6 +9,10 @@ from argsutil import parse_args_aidbox
 from row_parser import RowParser
 from spreadsheet import spreadsheet
 
+from error_handling import handle_aidbox_response
+import fhir_model
+
+LOGGER = logging.getLogger(__name__)
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 # The ID and range of a sample spreadsheet.
@@ -17,8 +22,7 @@ SAMPLE_RANGE_NAME = 'practitionerRole!A:F'
 
 def main(args):
     with spreadsheet(SAMPLE_SPREADSHEET_ID, SAMPLE_RANGE_NAME) as values:
-        practitioner_model = requests.get(
-            'https://raw.githubusercontent.com/cr-ste-justine/clin-FHIR/master/practitionerRole.json').json()
+        practitioner_model = fhir_model.get('practitionerRole.json')
         row_parser = RowParser(values[0][0:6])
 
         for row in values[1:]:
@@ -38,10 +42,7 @@ def main(args):
             response = requests.put(f"{args.url}/fhir/PractitionerRole/{practitioner_role['id']}", data=practitioner_role_json,
                                     headers={'Authorization': f"Basic {args.token}",
                                              "Content-Type": "application/json"})
-            if response.status_code not in (201, 200):
-                raise Exception(
-                    f'Aidobox did not return status code 201, status={response.status_code} \ntext={response.text} \nparticipant={practitioner_role_json}')
-
+            handle_aidbox_response(response, practitioner_role_json, LOGGER)
 
 
 if __name__ == '__main__':
